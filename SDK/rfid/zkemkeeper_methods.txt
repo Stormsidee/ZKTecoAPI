@@ -1,0 +1,657 @@
+MÉTODOS DISPONIBLES EN ZKEMKEEPER.DLL
+========================================
+Fecha de generación: 2025-03-05 05:23:18
+
+Total de métodos encontrados: 311
+
+MÉTODOS POR CATEGORÍA:
+========================================
+
+
+CONEXIÓN (8 métodos):
+----------------------------------------
+  - Connect_Com
+  - Connect_Modem
+  - Connect_Net
+  - Connect_P4P
+  - Connect_USB
+  - Disconnect
+  - GetLastError
+  - SetCommPassword
+
+CONTROL DE ACCESO (1 métodos):
+----------------------------------------
+  - GetDoorState
+
+TARJETAS (12 métodos):
+----------------------------------------
+  - CardNumber
+  - DelUserIDCardInfo
+  - EmptyCard
+  - GetCardFun
+  - GetHIDEventCardNumAsStr
+  - GetStrCardNumber
+  - GetUserIDCardInfo
+  - GetUserInfoByCard
+  - STR_CardNumber
+  - SetStrCardNumber
+  - SetUserIDCardInfo
+  - WriteCard
+
+USUARIOS (71 métodos):
+----------------------------------------
+  - CancelByUser
+  - ClearUserSMS
+  - DelUserFace
+  - DelUserTmp
+  - DeleteEnrollData
+  - DeleteUserInfoEx
+  - DeleteUserPhoto
+  - DeleteUserSMS
+  - DownloadUserPhoto
+  - EnableUser
+  - GetAllUserID
+  - GetAllUserInfo
+  - GetAllUserPhoto
+  - GetEnrollData
+  - GetEnrollDataStr
+  - GetUserFace
+  - GetUserFaceStr
+  - GetUserGroup
+  - GetUserIDByPIN2
+  - GetUserInfo
+  - GetUserInfoByPIN2
+  - GetUserInfoEx
+  - GetUserTZStr
+  - GetUserTZs
+  - GetUserTmp
+  - GetUserTmpEx
+  - GetUserTmpExStr
+  - GetUserTmpStr
+  - GetUserValidDate
+  - GetUserValidDateBatch
+  - GetUserVerifyStyle
+  - GetUserVerifyStyleBatch
+  - IsUserDefRoleEnable
+  - ReadAllUserID
+  - ReadUserAllTemplate
+  - SSR_DelUserTmp
+  - SSR_DelUserTmpExt
+  - SSR_DeleteEnrollData
+  - SSR_DeleteEnrollDataExt
+  - SSR_DeleteUserSMS
+  - SSR_EnableUser
+  - SSR_GetAllUserInfo
+  - SSR_GetUserInfo
+  - SSR_GetUserTmp
+  - SSR_GetUserTmpStr
+  - SSR_SetUserInfo
+  - SSR_SetUserSMS
+  - SSR_SetUserTmp
+  - SSR_SetUserTmpExt
+  - SSR_SetUserTmpStr
+  - SetEnrollData
+  - SetEnrollDataStr
+  - SetUserFace
+  - SetUserFaceStr
+  - SetUserGroup
+  - SetUserInfo
+  - SetUserInfoEx
+  - SetUserSMS
+  - SetUserTZStr
+  - SetUserTZs
+  - SetUserTmp
+  - SetUserTmpEx
+  - SetUserTmpExStr
+  - SetUserTmpStr
+  - SetUserValidDate
+  - SetUserValidDateBatch
+  - SetUserVerifyStyle
+  - SetUserVerifyStyleBatch
+  - StartEnroll
+  - StartEnrollEx
+  - UploadUserPhoto
+
+REGISTROS (24 métodos):
+----------------------------------------
+  - ClearGLog
+  - ClearSLog
+  - GetAllGLogData
+  - GetAllSLogData
+  - GetGeneralExtLogData
+  - GetGeneralLogData
+  - GetGeneralLogDataStr
+  - GetRTLog
+  - GetSuperLogData
+  - GetSuperLogData2
+  - GetSuperLogDataEx
+  - ReadAllGLogData
+  - ReadAllSLogData
+  - ReadGeneralLogData
+  - ReadLastestLogData
+  - ReadNewGLogData
+  - ReadRTLog
+  - ReadSuperLogData
+  - ReadSuperLogDataEx
+  - ReadTimeGLogData
+  - SSR_GetGeneralLogData
+  - SSR_GetGeneralLogDataEx
+  - SSR_GetSuperLogData
+  - UpdateLogo
+
+SISTEMA (17 métodos):
+----------------------------------------
+  - GetDeviceFirmwareVersion
+  - GetDeviceIP
+  - GetDeviceInfo
+  - GetDeviceMAC
+  - GetDeviceStatus
+  - GetDeviceStatusEx
+  - GetDeviceStrInfo
+  - GetDeviceTime
+  - GetPhotoNamesByTime
+  - SetCommuTimeOut
+  - SetDeviceCommPwd
+  - SetDeviceIP
+  - SetDeviceInfo
+  - SetDeviceMAC
+  - SetDeviceTableData
+  - SetDeviceTime
+  - SetDeviceTime2
+
+OTROS (178 métodos):
+----------------------------------------
+  - ACUnlock
+  - AccGroup
+  - AccTimeZones
+  - AddRef
+  - BASE64
+  - BackupData
+  - BatchDataMode
+  - BatchUpdate
+  - Beep
+  - BeginBatchUpdate
+  - CancelBatchUpdate
+  - CancelOperation
+  - CaptureImage
+  - ClearAdministrators
+  - ClearData
+  - ClearDataEx
+  - ClearKeeperData
+  - ClearLCD
+  - ClearPhotoByTime
+  - ClearSMS
+  - ClearWorkCode
+  - CloseAlarm
+  - CommPort
+  - ConvertBIG5
+  - ConvertPassword
+  - DelCustomizeAttState
+  - DelCustomizeVoice
+  - DeleteAttlogBetweenTheDate
+  - DeleteAttlogByTime
+  - DeletePermOfAppFun
+  - DeletePicture
+  - DeleteSMS
+  - DeleteWorkCode
+  - DisableDeviceWithTimeOut
+  - DownloadPicture
+  - EnableClock
+  - EnableCustomizeAttState
+  - EnableCustomizeVoice
+  - EnableDevice
+  - FPTempConvert
+  - FPTempConvertNew
+  - FPTempConvertNewStr
+  - FPTempConvertStr
+  - GetACFun
+  - GetAllAppFun
+  - GetAllRole
+  - GetAllSFIDName
+  - GetAppOfRole
+  - GetBackupNumber
+  - GetBellSchDataEx
+  - GetConnectStatus
+  - GetDataFile
+  - GetDataFileEx
+  - GetDayBellSchCount
+  - GetDaylight
+  - GetEachBellInfo
+  - GetFPTempLength
+  - GetFPTempLengthStr
+  - GetFirmwareVersion
+  - GetFunOfRole
+  - GetGroupTZStr
+  - GetGroupTZs
+  - GetHoliday
+  - GetIDsOfNames
+  - GetMaxBellIDInBellSchData
+  - GetPIN2
+  - GetPhotoByName
+  - GetPhotoByNameToFile
+  - GetPhotoCount
+  - GetPlatform
+  - GetProductCode
+  - GetSDKVersion
+  - GetSMS
+  - GetSensorSN
+  - GetSerialNumber
+  - GetShortkey
+  - GetSysOption
+  - GetTZInfo
+  - GetTypeInfo
+  - GetTypeInfoCount
+  - GetUnlockGroups
+  - GetVendor
+  - GetWiegandFmt
+  - GetWorkCode
+  - Invoke
+  - IsNewFirmwareMachine
+  - IsTFTMachine
+  - MachineNumber
+  - MaxP4PConnect
+  - MergeTemplate
+  - ModifyPrivilege
+  - PIN2
+  - PINWidth
+  - PlayVoice
+  - PlayVoiceByIndex
+  - PowerOffDevice
+  - PowerOnAllDevice
+  - PullMode
+  - QueryInterface
+  - QueryState
+  - ReadAOptions
+  - ReadAllBellSchData
+  - ReadAllTemplate
+  - ReadAttRule
+  - ReadCustData
+  - ReadDPTInfo
+  - ReadFile
+  - ReadMark
+  - ReadTurnInfo
+  - RefreshData
+  - RegEvent
+  - Release
+  - RestartDevice
+  - RestoreData
+  - SSRPin
+  - SSR_ClearWorkCode
+  - SSR_DeleteDeviceData
+  - SSR_DeleteWorkCode
+  - SSR_DeleteWorkCodeEx
+  - SSR_GetDeviceData
+  - SSR_GetDeviceDataCount
+  - SSR_GetGroupTZ
+  - SSR_GetHoliday
+  - SSR_GetShortkey
+  - SSR_GetUnLockGroup
+  - SSR_GetWorkCode
+  - SSR_GetWorkCodeEx
+  - SSR_GetWorkCodeExBatch
+  - SSR_GetWorkCodeExByID
+  - SSR_GetWorkCodeIDByName
+  - SSR_OutPutHTMLRep
+  - SSR_SetDeviceData
+  - SSR_SetGroupTZ
+  - SSR_SetHoliday
+  - SSR_SetShortkey
+  - SSR_SetUnLockGroup
+  - SSR_SetWorkCode
+  - SSR_SetWorkCodeEx
+  - SSR_SetWorkCodeExBatch
+  - SaveTheDataToFile
+  - SearchDevice
+  - SendCMDMsg
+  - SendFile
+  - SendFileByType
+  - SendFileEx
+  - SetBellSchDataEx
+  - SetCommProType
+  - SetCompatOldFirmware
+  - SetCustomizeAttState
+  - SetCustomizeVoice
+  - SetDaylight
+  - SetEventMode
+  - SetGroupTZStr
+  - SetGroupTZs
+  - SetHoliday
+  - SetLanguageByID
+  - SetLastCount
+  - SetManufacturerData
+  - SetOptionCommPwd
+  - SetPermOfAppFun
+  - SetSMS
+  - SetShortkey
+  - SetSysOption
+  - SetTZInfo
+  - SetUnlockGroups
+  - SetWiegandFmt
+  - SetWorkCode
+  - SplitTemplate
+  - StartIdentify
+  - StartVerify
+  - TurnOffAlarm
+  - UpdateFile
+  - UpdateFirmware
+  - UploadPicture
+  - UploadTheme
+  - UseGroupTimeZone
+  - WriteCustData
+  - WriteLCD
+
+
+LISTA COMPLETA DE MÉTODOS:
+========================================
+
+  1. ACUnlock
+  2. AccGroup
+  3. AccTimeZones
+  4. AddRef
+  5. BASE64
+  6. BackupData
+  7. BatchDataMode
+  8. BatchUpdate
+  9. Beep
+ 10. BeginBatchUpdate
+ 11. CancelBatchUpdate
+ 12. CancelByUser
+ 13. CancelOperation
+ 14. CaptureImage
+ 15. CardNumber
+ 16. ClearAdministrators
+ 17. ClearData
+ 18. ClearDataEx
+ 19. ClearGLog
+ 20. ClearKeeperData
+ 21. ClearLCD
+ 22. ClearPhotoByTime
+ 23. ClearSLog
+ 24. ClearSMS
+ 25. ClearUserSMS
+ 26. ClearWorkCode
+ 27. CloseAlarm
+ 28. CommPort
+ 29. Connect_Com
+ 30. Connect_Modem
+ 31. Connect_Net
+ 32. Connect_P4P
+ 33. Connect_USB
+ 34. ConvertBIG5
+ 35. ConvertPassword
+ 36. DelCustomizeAttState
+ 37. DelCustomizeVoice
+ 38. DelUserFace
+ 39. DelUserIDCardInfo
+ 40. DelUserTmp
+ 41. DeleteAttlogBetweenTheDate
+ 42. DeleteAttlogByTime
+ 43. DeleteEnrollData
+ 44. DeletePermOfAppFun
+ 45. DeletePicture
+ 46. DeleteSMS
+ 47. DeleteUserInfoEx
+ 48. DeleteUserPhoto
+ 49. DeleteUserSMS
+ 50. DeleteWorkCode
+ 51. DisableDeviceWithTimeOut
+ 52. Disconnect
+ 53. DownloadPicture
+ 54. DownloadUserPhoto
+ 55. EmptyCard
+ 56. EnableClock
+ 57. EnableCustomizeAttState
+ 58. EnableCustomizeVoice
+ 59. EnableDevice
+ 60. EnableUser
+ 61. FPTempConvert
+ 62. FPTempConvertNew
+ 63. FPTempConvertNewStr
+ 64. FPTempConvertStr
+ 65. GetACFun
+ 66. GetAllAppFun
+ 67. GetAllGLogData
+ 68. GetAllRole
+ 69. GetAllSFIDName
+ 70. GetAllSLogData
+ 71. GetAllUserID
+ 72. GetAllUserInfo
+ 73. GetAllUserPhoto
+ 74. GetAppOfRole
+ 75. GetBackupNumber
+ 76. GetBellSchDataEx
+ 77. GetCardFun
+ 78. GetConnectStatus
+ 79. GetDataFile
+ 80. GetDataFileEx
+ 81. GetDayBellSchCount
+ 82. GetDaylight
+ 83. GetDeviceFirmwareVersion
+ 84. GetDeviceIP
+ 85. GetDeviceInfo
+ 86. GetDeviceMAC
+ 87. GetDeviceStatus
+ 88. GetDeviceStatusEx
+ 89. GetDeviceStrInfo
+ 90. GetDeviceTime
+ 91. GetDoorState
+ 92. GetEachBellInfo
+ 93. GetEnrollData
+ 94. GetEnrollDataStr
+ 95. GetFPTempLength
+ 96. GetFPTempLengthStr
+ 97. GetFirmwareVersion
+ 98. GetFunOfRole
+ 99. GetGeneralExtLogData
+100. GetGeneralLogData
+101. GetGeneralLogDataStr
+102. GetGroupTZStr
+103. GetGroupTZs
+104. GetHIDEventCardNumAsStr
+105. GetHoliday
+106. GetIDsOfNames
+107. GetLastError
+108. GetMaxBellIDInBellSchData
+109. GetPIN2
+110. GetPhotoByName
+111. GetPhotoByNameToFile
+112. GetPhotoCount
+113. GetPhotoNamesByTime
+114. GetPlatform
+115. GetProductCode
+116. GetRTLog
+117. GetSDKVersion
+118. GetSMS
+119. GetSensorSN
+120. GetSerialNumber
+121. GetShortkey
+122. GetStrCardNumber
+123. GetSuperLogData
+124. GetSuperLogData2
+125. GetSuperLogDataEx
+126. GetSysOption
+127. GetTZInfo
+128. GetTypeInfo
+129. GetTypeInfoCount
+130. GetUnlockGroups
+131. GetUserFace
+132. GetUserFaceStr
+133. GetUserGroup
+134. GetUserIDByPIN2
+135. GetUserIDCardInfo
+136. GetUserInfo
+137. GetUserInfoByCard
+138. GetUserInfoByPIN2
+139. GetUserInfoEx
+140. GetUserTZStr
+141. GetUserTZs
+142. GetUserTmp
+143. GetUserTmpEx
+144. GetUserTmpExStr
+145. GetUserTmpStr
+146. GetUserValidDate
+147. GetUserValidDateBatch
+148. GetUserVerifyStyle
+149. GetUserVerifyStyleBatch
+150. GetVendor
+151. GetWiegandFmt
+152. GetWorkCode
+153. Invoke
+154. IsNewFirmwareMachine
+155. IsTFTMachine
+156. IsUserDefRoleEnable
+157. MachineNumber
+158. MaxP4PConnect
+159. MergeTemplate
+160. ModifyPrivilege
+161. PIN2
+162. PINWidth
+163. PlayVoice
+164. PlayVoiceByIndex
+165. PowerOffDevice
+166. PowerOnAllDevice
+167. PullMode
+168. QueryInterface
+169. QueryState
+170. ReadAOptions
+171. ReadAllBellSchData
+172. ReadAllGLogData
+173. ReadAllSLogData
+174. ReadAllTemplate
+175. ReadAllUserID
+176. ReadAttRule
+177. ReadCustData
+178. ReadDPTInfo
+179. ReadFile
+180. ReadGeneralLogData
+181. ReadLastestLogData
+182. ReadMark
+183. ReadNewGLogData
+184. ReadRTLog
+185. ReadSuperLogData
+186. ReadSuperLogDataEx
+187. ReadTimeGLogData
+188. ReadTurnInfo
+189. ReadUserAllTemplate
+190. RefreshData
+191. RegEvent
+192. Release
+193. RestartDevice
+194. RestoreData
+195. SSRPin
+196. SSR_ClearWorkCode
+197. SSR_DelUserTmp
+198. SSR_DelUserTmpExt
+199. SSR_DeleteDeviceData
+200. SSR_DeleteEnrollData
+201. SSR_DeleteEnrollDataExt
+202. SSR_DeleteUserSMS
+203. SSR_DeleteWorkCode
+204. SSR_DeleteWorkCodeEx
+205. SSR_EnableUser
+206. SSR_GetAllUserInfo
+207. SSR_GetDeviceData
+208. SSR_GetDeviceDataCount
+209. SSR_GetGeneralLogData
+210. SSR_GetGeneralLogDataEx
+211. SSR_GetGroupTZ
+212. SSR_GetHoliday
+213. SSR_GetShortkey
+214. SSR_GetSuperLogData
+215. SSR_GetUnLockGroup
+216. SSR_GetUserInfo
+217. SSR_GetUserTmp
+218. SSR_GetUserTmpStr
+219. SSR_GetWorkCode
+220. SSR_GetWorkCodeEx
+221. SSR_GetWorkCodeExBatch
+222. SSR_GetWorkCodeExByID
+223. SSR_GetWorkCodeIDByName
+224. SSR_OutPutHTMLRep
+225. SSR_SetDeviceData
+226. SSR_SetGroupTZ
+227. SSR_SetHoliday
+228. SSR_SetShortkey
+229. SSR_SetUnLockGroup
+230. SSR_SetUserInfo
+231. SSR_SetUserSMS
+232. SSR_SetUserTmp
+233. SSR_SetUserTmpExt
+234. SSR_SetUserTmpStr
+235. SSR_SetWorkCode
+236. SSR_SetWorkCodeEx
+237. SSR_SetWorkCodeExBatch
+238. STR_CardNumber
+239. SaveTheDataToFile
+240. SearchDevice
+241. SendCMDMsg
+242. SendFile
+243. SendFileByType
+244. SendFileEx
+245. SetBellSchDataEx
+246. SetCommPassword
+247. SetCommProType
+248. SetCommuTimeOut
+249. SetCompatOldFirmware
+250. SetCustomizeAttState
+251. SetCustomizeVoice
+252. SetDaylight
+253. SetDeviceCommPwd
+254. SetDeviceIP
+255. SetDeviceInfo
+256. SetDeviceMAC
+257. SetDeviceTableData
+258. SetDeviceTime
+259. SetDeviceTime2
+260. SetEnrollData
+261. SetEnrollDataStr
+262. SetEventMode
+263. SetGroupTZStr
+264. SetGroupTZs
+265. SetHoliday
+266. SetLanguageByID
+267. SetLastCount
+268. SetManufacturerData
+269. SetOptionCommPwd
+270. SetPermOfAppFun
+271. SetSMS
+272. SetShortkey
+273. SetStrCardNumber
+274. SetSysOption
+275. SetTZInfo
+276. SetUnlockGroups
+277. SetUserFace
+278. SetUserFaceStr
+279. SetUserGroup
+280. SetUserIDCardInfo
+281. SetUserInfo
+282. SetUserInfoEx
+283. SetUserSMS
+284. SetUserTZStr
+285. SetUserTZs
+286. SetUserTmp
+287. SetUserTmpEx
+288. SetUserTmpExStr
+289. SetUserTmpStr
+290. SetUserValidDate
+291. SetUserValidDateBatch
+292. SetUserVerifyStyle
+293. SetUserVerifyStyleBatch
+294. SetWiegandFmt
+295. SetWorkCode
+296. SplitTemplate
+297. StartEnroll
+298. StartEnrollEx
+299. StartIdentify
+300. StartVerify
+301. TurnOffAlarm
+302. UpdateFile
+303. UpdateFirmware
+304. UpdateLogo
+305. UploadPicture
+306. UploadTheme
+307. UploadUserPhoto
+308. UseGroupTimeZone
+309. WriteCard
+310. WriteCustData
+311. WriteLCD
