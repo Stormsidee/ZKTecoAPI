@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from SDK.molinete_test import ZKTecoDevice
 from SDK.rfid.ConnectionTurnstile import ConnectionTurnstile
+from PushSDK.push import *
 
 
 app = FastAPI(
@@ -10,12 +11,10 @@ app = FastAPI(
 )
 
 device = ZKTecoDevice()
-#device_zkem = ConnectionTurnstile()
 state_device = {"status":"disconnected"}
 
 def connect_to_device(ip="10.122.0.201",port=14370):
     device.connect(ip,port)
-   # device_zkem.connect(ip,port)
     global state_device
     state_device = {"status":"connected"}
     
@@ -39,11 +38,3 @@ def open_turnstile(seconds: int=5):
     else:
         return {"message":"Ошибка при открытии турникета"}
 
-"""
-@app.get('/get-users')
-def get_users():
-    users = device_zkem.get_users()
-    if users is None:
-        return {"message":"Ошибка при получении пользователей"}
-    else:
-        return {"users":users}"""
