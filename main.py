@@ -1,7 +1,9 @@
-from fastapi import FastAPI, Response, Request
-import hashlib
+from fastapi import FastAPI, Response, Request, Query
+import hashlib, secrets,requests
 from SDK.molinete_test import ZKTecoDevice
 from datetime import datetime
+import time,asyncio
+
 
 
 app = FastAPI(
@@ -60,8 +62,8 @@ TimeoutSec=10"""
         table = query_params.get('table', '')
         
         print(f"📥 Данные от {sn}, таблица: {table}")
-        
-        # Обрабатываем события открытия двери
+
+
         if table == "rtlog":
             await handle_access_event(sn, body_text)
         
@@ -69,6 +71,10 @@ TimeoutSec=10"""
             reg_devices[sn]['last_seen'] = datetime.now()
         
         return Response(content="OK", media_type="text/plain")
+
+def generate_token(registry_code, sn , session_id):
+    data = f"{registry_code}{sn}{session_id}"
+    return hashlib.md5(data.encode()).hexdigest()
 
 @app.api_route("/iclock/registry", methods=["POST"])
 async def handle_registry(request: Request):
@@ -132,15 +138,34 @@ async def handle_getrequest(request: Request):
     
     return Response(content="", media_type="text/plain")
 
-@app.api_route("/iclock/devicecmd", methods=["POST"])
+@app.post("/iclock/devicecmd")
 async def handle_devicecmd(request: Request):
+    body = await request.body()
+    body_text = body.decode('utf-8')
     query_params = dict(request.query_params)
     sn = query_params.get('SN', '')
     
-    body = await request.body()
-    body_text = body.decode('utf-8')
-    
     print(f"✅ Результат команды от {sn}: {body_text}")
+    
+    params = {}
+    for pair in body_text.split('&'):
+        if '=' in pair:
+            key, value = pair.split('=', 1)
+            params[key.strip()] = value.strip()
+    
+    if 'Return' in params:
+        return_code = int(params['Return'])
+        if return_code >= 0:
+            print(f"✅ Команда {params.get('ID')} выполнена успешно")
+        else:
+            print(f"❌ Ошибка команды {params.get('ID')}: код {return_code}")
+    
+    if 'CMD' in params and 'QUERY' in params['CMD']:
+        cmd_id = params.get('ID')
+        if hasattr(app.state, 'response_futures') and cmd_id in app.state.response_futures:
+            future = app.state.response_futures.pop(cmd_id)
+            if not future.done():
+                future.set_result(body_text)
     
     return Response(content="OK", media_type="text/plain")
 
@@ -173,19 +198,38 @@ async def handle_querydata(request: Request):
 
 #------------------------------#
 
+
 @app.get('/')
 def root():
     return {"message":"API is working!"}
 
-@app.post("/get_users")
-async def test_add_command(sn: str = "CMOU210460005"):
+@app.get('/check-users')
+async def check_users(sn: str = "CMOU210460005"):
+    """
+    Проверяет всех пользователей и их карты
+    """
     if sn not in cmd_queue:
-        return {"error": "Device not found"}
+        return {"error": f"Device {sn} not registered"}
     
-    command = "C:415:DATA QUERY tablename=user,fielddesc=*,filter=*"
-    cmd_queue[sn].append(command)
+    cmd_id = int(time.time() % 10000)
     
-    return {"status": "Command added", "device": sn}
+    command1 = f"C:{cmd_id}:DATA QUERY tablename=user,fielddesc=*,filter=*"
+    
+    cmd_id2 = cmd_id + 1
+    command2 = f"C:{cmd_id2}:DATA QUERY tablename=mulcarduser,fielddesc=*,filter=*"
+    
+    cmd_queue[sn].append(command1)
+    cmd_queue[sn].append(command2)
+    
+    return {
+        "status": "queries_sent",
+        "device": sn,
+        "queries": [
+            {"id": cmd_id, "table": "user", "cmd": command1},
+            {"id": cmd_id2, "table": "mulcarduser", "cmd": command2}
+        ]
+    }
+
 
 @app.post('/control/free-open')
 def free_open(sn: str = "CMOU210460005"):
@@ -230,19 +274,83 @@ async def handle_access_event(sn: str, data: str):
             key, value = item.split('=', 1)
             event_data[key.strip()] = value.strip()
     
-    cardno = event_data.get('cardno', '0')
+    cardno_hex = event_data.get('cardno', '0')
     event = event_data.get('event', '')
     pin = event_data.get('pin', '0')
     
-    if event == '1': 
-        print(f"🚪 ДВЕРЬ ОТКРЫТА! Карта: {cardno}, Пользователь: {pin}")
-    
-    elif event == '2': 
-        print(f"❌ ДОСТУП ЗАПРЕЩЕН! Карта: {cardno}, Пользователь: {pin}")
+    if cardno_hex != '0' and cardno_hex != '':
+        try:
+            cardno_hex = cardno_hex.lower().replace('0x', '').strip()
+            cardno_decimal = int(cardno_hex, 16)
+            
+            if event == '1': 
+                print(f"✅ Карта {cardno_decimal} (HEX: {cardno_hex}) (пользователь {pin}) - ДОСТУП РАЗРЕШЕН")
+            elif event == '2': 
+                print(f"❌ Карта {cardno_decimal} (HEX: {cardno_hex}) (пользователь {pin}) - ДОСТУП ЗАПРЕЩЕН")
+            else:
+                print(f"🎫 Карта {cardno_decimal} (HEX: {cardno_hex}) приложена (событие {event})")
+                
+        except ValueError:
+            print(f"⚠️ Ошибка конвертации карты {cardno_hex}")
     
     elif event == '6': 
         print(f"🔘 ОТКРЫТО КНОПКОЙ ВЫХОДА")
-    
     elif event == '8': 
         print(f"🖥️ ОТКРЫТО УДАЛЕННО (через API)")
 
+@app.post('/add-user')
+async def add_user(
+    cardno: str, 
+    name: str,
+    pin: int = None,
+    sn: str = "CMOU210460005"
+):
+    
+    if sn not in reg_devices:
+        return {"error": f"Device {sn} not registered"}
+    
+    if pin is None:
+        pin = int(time.time() % 1000000)
+    
+    cardno_hex = cardno.replace('0x', '').replace('0X', '').lower()
+    
+    if len(cardno_hex) < 8:
+        cardno_hex = cardno_hex.zfill(8)
+    
+    print(f"🎫 Карта: {cardno} -> очищенная: {cardno_hex} (нижний регистр!)")
+    
+    cmd_id1 = int(time.time() % 10000)
+    command1 = f"C:{cmd_id1}:DATA UPDATE user CardNo=0\tPin={pin}\tPassword=\tGroup=0\tStartTime=0\tEndTime=0\tName={name}\tPrivilege=0"
+    
+    cmd_id2 = cmd_id1 + 1
+    command2 = f"C:{cmd_id2}:DATA UPDATE mulcarduser Pin={pin}\tCardNo={cardno_hex}\tLossCardFlag=0\tCardType=0"
+
+    cmd_id3 = cmd_id2 + 1
+    command3 = f"C:{cmd_id3}:DATA UPDATE userauthorize Pin={pin}\tAuthorizeTimezoneId=1\tAuthorizeDoorId=1\tDevID=1"
+    
+    print(f"🔥 Команда 1: {command1}")
+    print(f"🔥 Команда 2: {command2}")
+    print(f"🔥 Команда 3: {command3}")
+    
+    if sn in cmd_queue:
+        cmd_queue[sn].append(command1)
+        cmd_queue[sn].append(command2)
+        cmd_queue[sn].append(command3)
+        
+        return {
+            "status": "commands_added",
+            "device": sn,
+            "user": {
+                "pin": pin,
+                "name": name,
+                "cardno_hex": cardno_hex,
+                "cardno_dec": int(cardno_hex, 16)
+            },
+            "commands": [
+                {"id": cmd_id1, "cmd": command1},
+                {"id": cmd_id2, "cmd": command2},
+                {"id": cmd_id3, "cmd": command3}
+            ]
+        }
+    
+    return {"error": "Failed to add commands"}

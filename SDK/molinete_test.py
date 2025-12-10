@@ -248,6 +248,7 @@ class ZKTecoDevice:
             return False
 
 
+
 def menu():
     device = ZKTecoDevice()
 
