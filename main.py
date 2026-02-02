@@ -12,18 +12,27 @@ app = FastAPI(
     version="1.0.0"
 )
 
-device = ZKTecoDevice()
-state_device = {"status":"unactive"}
-state_pusk_sdk = {"status":"unactive"}
 
-def connect_to_device(ip="10.122.0.201",port=14370):
-    device.connect(ip,port)
-    global state_device
-    state_device = {"status":"active"}
+state_push_sdk = {"status":"unactive"}
+
+def encode_time(date_str: str) -> int:
+    if len(date_str) != 14:
+        raise ValueError(f"Длина строки должна быть 14 символов, получено {len(date_str)}: {date_str}")
     
-    return state_device
-
-connect_to_device()
+    try:
+        year = int(date_str[0:4])
+        month = int(date_str[4:6])
+        day = int(date_str[6:8])
+        hour = int(date_str[8:10])
+        minute = int(date_str[10:12])
+        second = int(date_str[12:14])
+        
+        total_seconds = ((year - 2000) * 12 * 31 + ((month - 1) * 31) + day - 1) *(24*60* 60) + (hour * 60 + minute) * 60 + second;
+        
+        return total_seconds
+        
+    except ValueError as e:
+        raise ValueError(f"Неверный формат даты '{date_str}': {e}")
 
 
 #----------PUSH SDK------------#
@@ -135,8 +144,8 @@ async def handle_getrequest(request: Request):
         command = cmd_queue[sn].pop(0)
         print(f"📤 Отправляю команду для {sn}: {command}")
         return Response(content=command, media_type="text/plain")
-    
     return Response(content="", media_type="text/plain")
+
 
 @app.post("/iclock/devicecmd")
 async def handle_devicecmd(request: Request):
@@ -196,6 +205,34 @@ async def handle_querydata(request: Request):
     
     return Response(content="OK", media_type="text/plain")
 
+async def handle_access_event(sn: str, data: str):
+    event_data = {}
+    for item in data.split('\t'):
+        if '=' in item:
+            key, value = item.split('=', 1)
+            event_data[key.strip()] = value.strip()
+    
+    cardno_hex = event_data.get('cardno', '0')
+    event = event_data.get('event', '')
+    pin = event_data.get('pin', '0')
+    
+    if cardno_hex != '0' and cardno_hex != '':
+        try:
+            cardno_hex = cardno_hex.lower().replace('0x', '').strip()
+            cardno_decimal = int(cardno_hex, 16)
+            
+            if event == '0': 
+                print(f"✅ Карта {cardno_decimal} (HEX: {cardno_hex}) (пользователь {pin}) - ДОСТУП РАЗРЕШЕН")
+            elif event == '27': 
+                print(f"❌ Карта {cardno_decimal} (HEX: {cardno_hex}) (пользователь {pin}) - ДОСТУП ЗАПРЕЩЕН")
+            else:
+                print(f"🎫 Карта {cardno_decimal} (HEX: {cardno_hex}) приложена (событие {event})")
+                
+        except ValueError:
+            print(f"⚠️ Ошибка конвертации карты {cardno_hex}")
+    elif event == '8': 
+        print(f"🖥️ ОТКРЫТО УДАЛЕННО (через API)")
+
 #------------------------------#
 
 
@@ -217,94 +254,72 @@ async def check_users(sn: str = "CMOU210460005"):
     
     cmd_id2 = cmd_id + 1
     command2 = f"C:{cmd_id2}:DATA QUERY tablename=mulcarduser,fielddesc=*,filter=*"
+    cmd_id3 = cmd_id2 + 1
+    command3 = f"C:{cmd_id3}:DATA QUERY tablename=userauthorize,fielddesc=*,filter=*"
     
     cmd_queue[sn].append(command1)
     cmd_queue[sn].append(command2)
+    cmd_queue[sn].append(command3)
     
     return {
         "status": "queries_sent",
         "device": sn,
         "queries": [
             {"id": cmd_id, "table": "user", "cmd": command1},
-            {"id": cmd_id2, "table": "mulcarduser", "cmd": command2}
+            {"id": cmd_id2, "table": "mulcarduser", "cmd": command2},
+            {"id": cmd_id3, "table": "mulcarduser", "cmd": command3}
         ]
     }
-
-
-@app.post('/control/free-open')
-def free_open(sn: str = "CMOU210460005"):
-    if sn not in cmd_queue:
-        return {"error": "Device not found"}
-    
-    command = "C:221:CONTROL DEVICE 010101FF"
-    cmd_queue[sn].append(command)
-
-    return {"status": "Command added", "device": sn}
-
-@app.post('/control/free-close')
-def free_close(sn: str = "CMOU210460005"):
-    if sn not in cmd_queue:
-        return {"error": "Device not found"}
-    
-    command = "C:221:CONTROL DEVICE 01010100"
-    cmd_queue[sn].append(command)
-
-    return {"status": "Command added", "device": sn}
 
 @app.get('/status')
 def status():
     if reg_devices != {}:
-        global state_pusk_sdk
-        state_pusk_sdk = {"status":"active"}
-    return {"pusk_sdk":state_pusk_sdk,
-            "pull_sdk":state_device}
+        global state_push_sdk
+        state_push_sdk = {"status":"active"}
+    return {"pusk_sdk":state_push_sdk}
         
 @app.post('/open/')
-def open_turnstile(seconds: int=5):
-    door = device.control_device(operation_id=1,door_id=1,state=seconds)
-    if door == True:
-        return {"message":"Турникет открыт на {} секунд".format(seconds)}
+def open_turnstile(sn: str = "CMOU210460005", seconds: int = 5, door: int = 1):
+    if sn not in cmd_queue:
+        return {"error": "Device not found"}
+    
+    if seconds < 10:
+        command = f"C:221:CONTROL DEVICE 01010{door}0{seconds}"
     else:
-        return {"message":"Ошибка при открытии турникета"}
-    
-async def handle_access_event(sn: str, data: str):
-    event_data = {}
-    for item in data.split('\t'):
-        if '=' in item:
-            key, value = item.split('=', 1)
-            event_data[key.strip()] = value.strip()
-    
-    cardno_hex = event_data.get('cardno', '0')
-    event = event_data.get('event', '')
-    pin = event_data.get('pin', '0')
-    
-    if cardno_hex != '0' and cardno_hex != '':
-        try:
-            cardno_hex = cardno_hex.lower().replace('0x', '').strip()
-            cardno_decimal = int(cardno_hex, 16)
-            
-            if event == '1': 
-                print(f"✅ Карта {cardno_decimal} (HEX: {cardno_hex}) (пользователь {pin}) - ДОСТУП РАЗРЕШЕН")
-            elif event == '2': 
-                print(f"❌ Карта {cardno_decimal} (HEX: {cardno_hex}) (пользователь {pin}) - ДОСТУП ЗАПРЕЩЕН")
-            else:
-                print(f"🎫 Карта {cardno_decimal} (HEX: {cardno_hex}) приложена (событие {event})")
-                
-        except ValueError:
-            print(f"⚠️ Ошибка конвертации карты {cardno_hex}")
-    
-    elif event == '6': 
-        print(f"🔘 ОТКРЫТО КНОПКОЙ ВЫХОДА")
-    elif event == '8': 
-        print(f"🖥️ ОТКРЫТО УДАЛЕННО (через API)")
+        command = f"C:221:CONTROL DEVICE 01010{door}{seconds}"
+    cmd_queue[sn].append(command)
 
-@app.post('/add-user')
-async def add_user(
+    return {"status": "Command added", "device": sn}
+
+@app.post('/cmd')
+def cmd_send(sn: str = "CMOU210460005", cmd: str = ""):
+    if sn not in cmd_queue:
+        return {"error": "Device not found"}
+    
+    command = f"C:221:CONTROL DEVICE {cmd}"
+    cmd_queue[sn].append(command)
+
+    return {"status": "Command added", "device": sn}
+
+@app.post('/passage')
+def passage_mode(sn: str = "CMOU210460005",mode: str = "off"):
+    if sn not in cmd_queue:
+        return {"error": "Device not found"}
+    if mode == "on":
+        command = f"C:221:CONTROL DEVICE 010102FF00"
+    elif mode == "off":
+        command = f"C:221:CONTROL DEVICE 0101020000"
+    cmd_queue[sn].append(command)
+
+    return {"status": "Command added", "device": sn}
+
+
+@app.post('/add-card')
+async def add_card(
     cardno: str, 
     name: str,
     pin: int = None,
-    sn: str = "CMOU210460005"
-):
+    sn: str = "CMOU210460005"):
     
     if sn not in reg_devices:
         return {"error": f"Device {sn} not registered"}
@@ -320,13 +335,13 @@ async def add_user(
     print(f"🎫 Карта: {cardno} -> очищенная: {cardno_hex} (нижний регистр!)")
     
     cmd_id1 = int(time.time() % 10000)
-    command1 = f"C:{cmd_id1}:DATA UPDATE user CardNo=0\tPin={pin}\tPassword=\tGroup=0\tStartTime=0\tEndTime=0\tName={name}\tPrivilege=0"
+    command1 = f"C:{cmd_id1}:DATA UPDATE user CardNo=\tPin={pin}\tPassword=\tGroup=0\tStartTime=0\tEndTime=0\tName={name}\tPrivilege=0"
     
     cmd_id2 = cmd_id1 + 1
     command2 = f"C:{cmd_id2}:DATA UPDATE mulcarduser Pin={pin}\tCardNo={cardno_hex}\tLossCardFlag=0\tCardType=0"
 
     cmd_id3 = cmd_id2 + 1
-    command3 = f"C:{cmd_id3}:DATA UPDATE userauthorize Pin={pin}\tAuthorizeTimezoneId=1\tAuthorizeDoorId=1\tDevID=1"
+    command3 = f"C:{cmd_id3}:DATA UPDATE userauthorize Pin={pin}\tAuthorizeTimezoneId=1\tAuthorizeDoorId=1\tDevID=3"
     
     print(f"🔥 Команда 1: {command1}")
     print(f"🔥 Команда 2: {command2}")
@@ -354,3 +369,35 @@ async def add_user(
         }
     
     return {"error": "Failed to add commands"}
+
+
+@app.post('/delete-user')
+def delete_users(pin:int = None,sn: str = "CMOU210460005"):
+    cmd_id1 = int(time.time() % 10000)
+    if pin == None:
+        command1 = f"C:{cmd_id1}:DATA DELETE user Pin=*"
+        command2 = f"C:{cmd_id1+1}:DATA DELETE mulcarduser Pin=*"
+        command3 = f"C:{cmd_id1+2}:DATA DELETE userauthorize Pin=*"
+    else:
+        command1 = f"C:{cmd_id1}:DATA DELETE user Pin={pin}"
+        command2 = f"C:{cmd_id1+1}:DATA DELETE mulcarduser Pin={pin}"
+        command3 = f"C:{cmd_id1+2}:DATA DELETE userauthorize Pin={pin}"
+    
+
+    if sn in cmd_queue:
+        cmd_queue[sn].append(command1)
+        cmd_queue[sn].append(command2)
+        cmd_queue[sn].append(command3)
+        
+        return {
+            "status": "commands_added",
+            "device": sn,
+            "commands": [
+                {"id": cmd_id1, "cmd": command1},
+                {"id": cmd_id1, "cmd": command2},
+                {"id": cmd_id1, "cmd": command3}
+            ]
+        }
+    
+    return {"error": "Failed to add commands"}
+
