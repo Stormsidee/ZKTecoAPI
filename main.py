@@ -15,24 +15,23 @@ app = FastAPI(
 
 state_push_sdk = {"status":"unactive"}
 
-def encode_time(date_str: str) -> int:
-    if len(date_str) != 14:
-        raise ValueError(f"Длина строки должна быть 14 символов, получено {len(date_str)}: {date_str}")
-    
-    try:
-        year = int(date_str[0:4])
-        month = int(date_str[4:6])
-        day = int(date_str[6:8])
-        hour = int(date_str[8:10])
-        minute = int(date_str[10:12])
-        second = int(date_str[12:14])
-        
-        total_seconds = ((year - 2000) * 12 * 31 + ((month - 1) * 31) + day - 1) *(24*60* 60) + (hour * 60 + minute) * 60 + second;
-        
-        return total_seconds
-        
-    except ValueError as e:
-        raise ValueError(f"Неверный формат даты '{date_str}': {e}")
+def zk_encode_time(dt_str: str) -> int:
+    """
+    Конвертирует 'DD-MM-YYYY HH:MM:SS' в ZKTeco seconds (Appendix 5)
+    """
+    dt = datetime.strptime(dt_str, "%d-%m-%Y %H:%M:%S")
+
+    year = dt.year
+    mon = dt.month
+    day = dt.day
+    hour = dt.hour
+    minute = dt.minute
+    sec = dt.second
+
+    tt = ((year - 2000) * 12 * 31 + (mon - 1) * 31 + (day - 1)) * 24 * 60 * 60 \
+         + (hour * 60 + minute) * 60 + sec
+
+    return tt
 
 
 #----------PUSH SDK------------#
@@ -225,6 +224,8 @@ async def handle_access_event(sn: str, data: str):
                 print(f"✅ Карта {cardno_decimal} (HEX: {cardno_hex}) (пользователь {pin}) - ДОСТУП РАЗРЕШЕН")
             elif event == '27': 
                 print(f"❌ Карта {cardno_decimal} (HEX: {cardno_hex}) (пользователь {pin}) - ДОСТУП ЗАПРЕЩЕН")
+            elif event == '29': 
+                print(f"⚠️ Карта {cardno_decimal} (HEX: {cardno_hex}) (пользователь {pin}) - СРОК ДЕЙСТВИЯ ИСТЕК ИЛИ НЕ НАЧАЛСЯ")
             else:
                 print(f"🎫 Карта {cardno_decimal} (HEX: {cardno_hex}) приложена (событие {event})")
                 
@@ -318,8 +319,13 @@ def passage_mode(sn: str = "CMOU210460005",mode: str = "off"):
 async def add_card(
     cardno: str, 
     name: str,
+    starttime: str = "0",
+    endtime: str = "0",
     pin: int = None,
     sn: str = "CMOU210460005"):
+    
+    time1 = zk_encode_time(starttime)
+    time2 = zk_encode_time(endtime)
     
     if sn not in reg_devices:
         return {"error": f"Device {sn} not registered"}
@@ -335,7 +341,7 @@ async def add_card(
     print(f"🎫 Карта: {cardno} -> очищенная: {cardno_hex} (нижний регистр!)")
     
     cmd_id1 = int(time.time() % 10000)
-    command1 = f"C:{cmd_id1}:DATA UPDATE user CardNo=\tPin={pin}\tPassword=\tGroup=0\tStartTime=0\tEndTime=0\tName={name}\tPrivilege=0"
+    command1 = f"C:{cmd_id1}:DATA UPDATE user CardNo=\tPin={pin}\tPassword=\tGroup=0\tStartTime={time1}\tEndTime={time2}\tName={name}\tPrivilege=0"
     
     cmd_id2 = cmd_id1 + 1
     command2 = f"C:{cmd_id2}:DATA UPDATE mulcarduser Pin={pin}\tCardNo={cardno_hex}\tLossCardFlag=0\tCardType=0"
