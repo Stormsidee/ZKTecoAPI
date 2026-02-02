@@ -12,6 +12,7 @@
 ```bash
 - pip install -r requirements.txt
 - uvicorn main:app --host 0.0.0.0 --port 9088
+- Setup ZKTeco Device on your IP and port 9088
 ```
 ------------------------------------
 
