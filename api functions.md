@@ -1,13 +1,5 @@
 # ZKTeco C2-260 API FUNCTIONS
 
-## ✈️ Quick Start
-------------------------------------
-```bash
-- pip install -r requirements.txt
-- uvicorn main:app --host 0.0.0.0 --port 9088
-```
-------------------------------------
-
 ## 🌐 API Endpoints
 
 ### 📥 PUSH SDK (Device → Server)
