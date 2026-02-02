@@ -24,7 +24,7 @@
 | `POST` | `/open/` | Open turnstile | `sn`, `seconds`, `door` |
 | `POST` | `/cmd` | Send raw command | `sn`, `cmd` |
 | `POST` | `/passage` | Toggle passage mode | `sn`, `mode=on/off` |
-| `POST` | `/add-card` | Add user & card | `sn`, `cardno`, `name`, `pin` (optional) |
+| `POST` | `/add-card` | Add user & card | `sn`, `cardno`, `starttime`, `endtime`, `name`, `pin` (optional) |
 | `POST` | `/delete-user` | Delete user(s) | `sn`, `pin` (optional, `None` = delete all) |
 
 ## 📝 Notes
