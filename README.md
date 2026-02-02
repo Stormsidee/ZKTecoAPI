@@ -1,5 +1,6 @@
 # ZKTeco C2-260 API
 
+
 ## 🛠 Technology stack
 ```bash
 - Python 3.14
