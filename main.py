@@ -318,10 +318,10 @@ def passage_mode(sn: str = "CMOU210460005",mode: str = "off"):
 @app.post('/add-card')
 async def add_card(
     cardno: str, 
-    name: str,
+    name: str = "",
     starttime: str = "0",
     endtime: str = "0",
-    pin: int = None,
+    pin: str = None,
     sn: str = "CMOU210460005"):
     
     time1 = zk_encode_time(starttime)
@@ -378,7 +378,7 @@ async def add_card(
 
 
 @app.post('/delete-user')
-def delete_users(pin:int = None,sn: str = "CMOU210460005"):
+def delete_users(pin:str = None,sn: str = "CMOU210460005"):
     cmd_id1 = int(time.time() % 10000)
     if pin == None:
         command1 = f"C:{cmd_id1}:DATA DELETE user Pin=*"
