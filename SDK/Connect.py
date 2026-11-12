@@ -29,7 +29,7 @@ def conectar_molinete(ip, puerto):
 
 
 if __name__ == "__main__":
-    ip_molinete = "10.122.0.201"
+    ip_molinete = "192.0.2.10"
     puerto_molinete = 14370
 
     hcommpro = conectar_molinete(ip_molinete, puerto_molinete)

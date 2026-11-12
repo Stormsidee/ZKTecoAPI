@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Response, Request, Query
-import hashlib, secrets,requests
-from SDK.molinete_test import ZKTecoDevice
+from fastapi import FastAPI, Request, Response
+import hashlib
+import secrets
 from datetime import datetime
 import time,asyncio
 

@@ -1,20 +1,26 @@
-# ZKTeco C2-260 API
+# ZKTecoAPI
 
-## 🛠 Technology stack
+Python-сервис на FastAPI для обмена с контроллером ZKTeco C2-260. Устройство регистрируется на сервере, забирает команды из очереди и передаёт результаты их выполнения. Сервис также принимает события доступа.
+
+## Локальный запуск
+
 ```bash
-- Python 3.14
-- FastAPI
-- ZKTeco Pull SDK
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m uvicorn main:app --host 127.0.0.1 --port 9088
 ```
 
-## ✈️ Quick Start
-------------------------------------
-```bash
-- pip install -r requirements.txt
-- uvicorn main:app --host 0.0.0.0 --port 9088
-- Setup ZKTeco Device on your IP and port 9088
-```
-------------------------------------
+Проверка без контроллера:
 
-## 📚 API Documentation
-📄 [API Functions & Endpoints](api%20functions.md)
+```bash
+curl --fail http://127.0.0.1:9088/
+```
+
+Ожидаемый ответ: `{"message":"API is working!"}`.
+
+## Устройство проекта
+
+- `main.py` реализует HTTP API и обмен с контроллером по Push-протоколу.
+- `SDK/` содержит отдельные эксперименты с Windows DLL для Pull SDK.
+- Очередь и состояние устройств хранятся в памяти процесса. Пример предназначен для локального стенда.

@@ -19,7 +19,7 @@ class ZKTecoDevice:
             print(f"Ошибка при загрузке библиотеки: {e}")
             sys.exit(1)
 
-    def connect(self, ip_address="10.122.0.201", port=14370, timeout=4000, password=""):
+    def connect(self, ip_address="192.0.2.10", port=14370, timeout=4000, password=""):
         if self.connected:
             print("Устройство уже подключено")
             return True
@@ -265,7 +265,7 @@ def menu():
         opcion = input("\nВыберите пункт меню: ")
 
         if opcion == "1":
-            ip = input("IP‑адрес устройства [10.122.0.201]: ") or "10.122.0.201"
+            ip = input("IP‑адрес устройства [192.0.2.10]: ") or "192.0.2.10"
             device.connect(ip_address=ip)
         elif opcion == "2":
             device.get_device_info()
